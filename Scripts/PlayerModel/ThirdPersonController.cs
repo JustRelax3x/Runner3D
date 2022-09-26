@@ -40,12 +40,16 @@ namespace StarterAssets
         public LayerMask GroundLayer;
 
         [SerializeField]
+        private float _horizontalMovement;
+
+        [SerializeField]
         private PlayerInput _input;
 
         // player
         private float _speed;
 
-        private float _animationBlend;
+        private float _currentSpeedChangeRate = 0;
+        private float _startSpeed = 0;
         private float _verticalVelocity = 0f;
         private float _terminalVelocity = 53.0f;
 
@@ -66,6 +70,7 @@ namespace StarterAssets
         private CharacterController _controller;
 
         private bool _hasAnimator;
+        private bool _moving = false;
 
         private void Start()
         {
@@ -110,41 +115,36 @@ namespace StarterAssets
 
         private void Move()
         {
-            float targetSpeed = MoveSpeed;
-
-            // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is no input, set the target speed to 0
-            if (!_input.IsMoving) targetSpeed = 0.0f;
-
-            // a reference to the players current horizontal velocity
-            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
-            float speedOffset = 0.1f;
+            float targetSpeed = _input.IsMoving? MoveSpeed : 0.0f;
+            if (!_input.IsMoving && _moving)
+            {
+                _moving = false;
+                _startSpeed = _speed;
+                _currentSpeedChangeRate = 0;
+            }
+            else if (_input.IsMoving && !_moving)
+            {
+                _moving = true;
+                _startSpeed = _speed;
+                _currentSpeedChangeRate = 0;
+            }
+            float speedOffset = 0.05f;
 
             // accelerate or decelerate to target speed
-            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
-                currentHorizontalSpeed > targetSpeed + speedOffset)
+            if (_speed < targetSpeed - speedOffset || _speed > targetSpeed + speedOffset)
             {
                 // creates curved result rather than a linear one giving a more organic speed change
                 // note T in Lerp is clamped, so we don't need to clamp our speed
-                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed,
-                    Time.deltaTime * SpeedChangeRate);
-
-                // round speed to 3 decimal places
-                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+                _currentSpeedChangeRate += SpeedChangeRate;
+                _speed = Mathf.Lerp(_startSpeed, targetSpeed, _currentSpeedChangeRate);
             }
             else
             {
                 _speed = targetSpeed;
             }
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-            if (_animationBlend < 0.01f) _animationBlend = 0f;
-
             // normalise input direction
-            Vector3 inputDirection = new Vector3(_input.Horizontal, 0.0f, 1f).normalized;
+            Vector3 inputDirection = new Vector3(_input.Horizontal * _horizontalMovement, 0.0f, 1f).normalized;
 
             // move the player
             _controller.Move(inputDirection * (_speed * Time.deltaTime) +
@@ -153,7 +153,7 @@ namespace StarterAssets
             // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                _animator.SetFloat(_animIDSpeed, _speed);
                 _animator.SetFloat(_animIDMotionSpeed, 1f);
             }
         }

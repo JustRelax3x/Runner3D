@@ -15,4 +15,11 @@ public class PlayerInput : MonoBehaviour
     {
         Horizontal = _joystick.Horizontal;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out StopLine _))
+            IsMoving = false;
+    }
+
 }

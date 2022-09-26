@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletPool : MonoBehaviour
+public class BulletPool : MonoBehaviour, IPool
 {
     [SerializeField]
     private Bullet _bulletPrefab;
@@ -34,6 +34,7 @@ public class BulletPool : MonoBehaviour
     private Bullet CreateBullet()
     {
         var bullet = Instantiate(_bulletPrefab, transform, false);
+        bullet.SetPool(this);
         bullet.gameObject.SetActive(false);
         return bullet;
     }
@@ -57,5 +58,11 @@ public class BulletPool : MonoBehaviour
     private void OnDestroy()
     {
         Instance = null;
+    }
+
+    public void ReturnToPool(GameObject gameObject)
+    {
+        if (gameObject.TryGetComponent(out Bullet bullet))
+            ReturnBullet(bullet);
     }
 }

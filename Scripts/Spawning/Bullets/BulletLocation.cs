@@ -1,8 +1,8 @@
 using UnityEngine;
-
-[RequireComponent(typeof(Collider))]
-public class BulletSpawner : MonoBehaviour
+public class BulletLocation : BehaviorLocation
 {
+    public override LocationType GetLocationType() => LocationType.Bullet;
+
     private const float _maxOffset = 15f, _minOffset = 2f;
 
     private Bullet[] _bullets = new Bullet[3];
@@ -23,16 +23,21 @@ public class BulletSpawner : MonoBehaviour
         }
     }
 
+    public override void Recycle()
+    {
+        foreach (var b in _bullets) b.Recycle();
+        _pool.ReturnToPool(gameObject);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag(GameConstants.PlayerTag)) return;
-        SpawnBullets(other.transform.position);
+        if (other.TryGetComponent(out CharacterController _))
+            SpawnBullets(other.transform.position);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag(GameConstants.PlayerTag)) return;
-        foreach (var b in _bullets) BulletPool.Instance.ReturnBullet(b);
-        gameObject.SetActive(false); //To Do ObjectPool.Return
+        if (other.TryGetComponent(out CharacterController _))
+            Recycle();
     }
 }
