@@ -6,6 +6,7 @@ public class LocationsPool : MonoBehaviour, IPool
     private BehaviorLocation[] _locationsPrefab;
 
     private readonly Queue<BehaviorLocation> _bulletsPool = new Queue<BehaviorLocation>(2);
+    private readonly Queue<BehaviorLocation> _carPool = new Queue<BehaviorLocation>(2);
 
     public BehaviorLocation GetLocation(LocationType location, Vector3 position)
     {
@@ -30,9 +31,11 @@ public class LocationsPool : MonoBehaviour, IPool
         {
             case LocationType.Bullet:
                 return _bulletsPool;
+            case LocationType.Car:
+                return _carPool; 
             case LocationType.Length:
                 Debug.LogError("Prohibited Usage");
-                break; 
+                break;
         }
         return _bulletsPool;
     }
@@ -48,5 +51,6 @@ public class LocationsPool : MonoBehaviour, IPool
 public enum LocationType
 {
     Bullet = 0,
+    Car = 1,
     Length,
 }
