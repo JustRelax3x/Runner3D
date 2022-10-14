@@ -1,4 +1,4 @@
 # Runner3D
 Hyper-casual Runner 3d
 
-![Demo](https://user-images.githubusercontent.com/81527743/195779844-180aa31e-bc33-4cde-8515-8d0259e0b3b3.mp4)
+![Demo](https://user-images.githubusercontent.com/81527743/195793613-19d7a2d0-826a-4f7f-89f2-7699b4ecdf76.gif)
