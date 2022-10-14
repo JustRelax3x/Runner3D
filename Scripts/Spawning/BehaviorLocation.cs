@@ -4,9 +4,16 @@ public abstract class BehaviorLocation : MonoBehaviour
 {
     protected IPool _pool;
 
-    public void SetPool(IPool pool)
+    protected BehaviorPool _behaviorPool;
+
+    public void SetLocationPool(IPool pool)
     {
         _pool = pool;
+    }
+
+    public void SetBehaviorPool(BehaviorPool pool)
+    {
+        _behaviorPool = pool;
     }
     public abstract LocationType GetLocationType();
     public abstract void Recycle();

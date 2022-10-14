@@ -1,32 +1,21 @@
 using UnityEngine;
 
-public class BehaviorForward : MonoBehaviour
+public class BehaviorForward : Behavior
 {
     [SerializeField]
-    private int damageDivisionCoefficient = 3;
-    private readonly Vector3 _speed = new Vector3(0, 0, 0.8f);
+    private Vector3 _speed = new Vector3(0, 0, 0.8f);
+    [SerializeField]
+    private bool _isActiveAfterCollision = true;
 
-    private IPool _pool;
-
-    private void Update()
+    private void FixedUpdate()
     {
         transform.Translate(_speed, Space.Self);
     }
 
-    public void SetPool(IPool pool)
-    {
-        _pool = pool;
-    }
-
-    public void Recycle()
-    {
-        _pool.ReturnToPool(gameObject);
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.TryGetComponent(out AbilityHandler abilityHandler)) return;
+        if (!other.TryGetComponent(out PlayerDataHandler abilityHandler)) return;
         abilityHandler.DamagePlayer(damageDivisionCoefficient);
-        gameObject.SetActive(false);
+        if (!_isActiveAfterCollision) gameObject.SetActive(false); 
     }
 }

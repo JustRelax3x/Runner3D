@@ -5,8 +5,14 @@ public class LocationsPool : MonoBehaviour, IPool
     [SerializeField]
     private BehaviorLocation[] _locationsPrefab;
 
-    private readonly Queue<BehaviorLocation> _bulletsPool = new Queue<BehaviorLocation>(2);
-    private readonly Queue<BehaviorLocation> _carPool = new Queue<BehaviorLocation>(2);
+    [SerializeField]
+    private BehaviorPool[] _behaviorsPools; 
+
+    private readonly Queue<BehaviorLocation> _bulletsLocationPool = new Queue<BehaviorLocation>(2);
+    private readonly Queue<BehaviorLocation> _carLocationPool = new Queue<BehaviorLocation>(2);
+    private readonly Queue<BehaviorLocation> _manHoleLocationPool = new Queue<BehaviorLocation>(2);
+
+    public int Count() => _locationsPrefab.Length;
 
     public BehaviorLocation GetLocation(LocationType location, Vector3 position)
     {
@@ -20,7 +26,8 @@ public class LocationsPool : MonoBehaviour, IPool
     private BehaviorLocation CreateLocation(LocationType loc)
     {
         var location = Instantiate(_locationsPrefab[(int)loc], transform, true);
-        location.SetPool(this);
+        location.SetBehaviorPool(_behaviorsPools[(int)loc]);
+        location.SetLocationPool(this);
         location.gameObject.SetActive(false);
         return location;
     }
@@ -30,14 +37,16 @@ public class LocationsPool : MonoBehaviour, IPool
         switch (location)
         {
             case LocationType.Bullet:
-                return _bulletsPool;
+                return _bulletsLocationPool;
             case LocationType.Car:
-                return _carPool; 
+                return _carLocationPool;
+            case LocationType.ManHole:
+                return _manHoleLocationPool;
             case LocationType.Length:
                 Debug.LogError("Prohibited Usage");
                 break;
         }
-        return _bulletsPool;
+        return _bulletsLocationPool;
     }
 
     public void ReturnToPool(GameObject gameObject)
@@ -52,5 +61,6 @@ public enum LocationType
 {
     Bullet = 0,
     Car = 1,
+    ManHole = 2,
     Length,
 }

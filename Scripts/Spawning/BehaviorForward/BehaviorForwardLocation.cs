@@ -2,8 +2,6 @@ using UnityEngine;
 public class BehaviorForwardLocation : BehaviorLocation
 {
     [SerializeField]
-    private BehaviorPool _behaviorPool;
-    [SerializeField]
     private LocationType _locationType;
     [SerializeField]
     private int _behaviorQuantity = 1;
@@ -11,12 +9,12 @@ public class BehaviorForwardLocation : BehaviorLocation
 
     private const float _maxOffset = 9f, _minOffset = 2f;
 
-    private BehaviorForward[] _behavior;
+    private Behavior[] _behavior;
 
     private void Start()
     {
         if (_behaviorQuantity <= 0) _behaviorQuantity = 1;
-        _behavior = new BehaviorForward[_behaviorQuantity];
+        _behavior = new Behavior[_behaviorQuantity];
     }
     private void SpawnBehavior(Vector3 targetPos)
     {
@@ -27,7 +25,7 @@ public class BehaviorForwardLocation : BehaviorLocation
         destination.z -= 5 * offsetZ;
         for (int i = 0; i < _behaviorQuantity; i++)
         {
-            BehaviorForward behavior = _behaviorPool.GetBehavior(transform.position + offset);
+            Behavior behavior = _behaviorPool.GetBehavior(transform.position + offset);
             behavior.transform.LookAt(destination);
             _behavior[i] = behavior;
             offsetX = Random.Range(_minOffset, _maxOffset);

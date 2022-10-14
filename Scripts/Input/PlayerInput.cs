@@ -11,15 +11,25 @@ public class PlayerInput : MonoBehaviour
 
     public float Horizontal { get; private set; } = 0f;
 
+
+    public void Move()
+    {
+        IsMoving = true;
+    }
+
+    public void Restart()
+    {
+        IsMoving = false;
+    }
+
+    public void Stop()
+    {
+        IsMoving = false;
+    }
+
     private void FixedUpdate()
     {
         Horizontal = _joystick.Horizontal;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.TryGetComponent(out StopLine _))
-            IsMoving = false;
     }
 
 }
